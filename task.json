@@ -12,7 +12,7 @@
     "version":  {
                     "Major":  1,
                     "Minor":  0,
-                    "Patch":  3
+                    "Patch":  4
                 },
     "minimumAgentVersion":  "1.83.0",
     "inputs":  [
@@ -44,23 +44,28 @@
                        "defaultValue":  "",
                        "required":  true,
                        "helpMarkDown":  "The path to the folder that needs to be cleaned."
-                   },
-                   {
+                   },{
+					   "name":  "excludes",
+                       "type":  "string",
+                       "label":  "Omits the specified items",
+                       "defaultValue":  "",
+                       "required":  false,
+                       "helpMarkDown":  "Omits the specified items. The value of this parameter qualifies the Path parameter. Enter a path element or pattern, such as '*.txt'. Wildcards are permitted. You can use line break or comma to add multiple patterns"
+				   },{
                        "name":  "retentionDays",
                        "type":  "string",
                        "label":  "Days to keep",
                        "defaultValue":  "30",
-                       "required":  false,
+                       "required":  true,
                        "helpMarkDown":  "Retention days."
-                   },
-                   {
+                   },{
                        "name":  "minimumToKeep",
                        "type":  "string",
                        "label":  "Minimum to keep",
                        "defaultValue":  "2",
-                       "required":  false,
+                       "required":  true,
                        "helpMarkDown":  "Minimum to keep."
-                   }
+                   }				   
                ],
     "instanceNameFormat":  "Remote cleaner $(remoteComputer) $(folderPath).",
     "execution":  {
