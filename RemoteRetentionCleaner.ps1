@@ -12,7 +12,7 @@ Trace-VstsEnteringInvocation $MyInvocation
 [string]$password = Get-VstsInput -Name "password" -Require
 [string]$excludes = (Get-VstsInput -Name "excludes").Trim().Replace("`n",",")
 
-Write-Host "Version 1.0.7"
+Write-Host "Version 1.0.8"
 Write-Host "remoteComputer = $remoteComputer"
 Write-Host "folderPath = $folderPath"
 Write-Host "retentionDays = $retentionDays"
@@ -95,17 +95,36 @@ $computers = $remoteComputer.split(',',[System.StringSplitOptions]::RemoveEmptyE
 if($computers.Count -eq 0)
   {  Write-Error "No remote computer"}
    
+$errors =@()
+
 foreach($computer in $computers)
 {
-	Write-Host "Start process. Computer name : $($computer)."
-	Write-Host "	- PSCredential"
-	$credential = New-Object System.Management.Automation.PSCredential($userName, (ConvertTo-SecureString -String $password -AsPlainText -Force));
-	Write-Host "	- Initialize New-PSSession"
-	$session = New-PSSession -ComputerName $computer -Credential $credential;
-	Write-Host "	- Invoke-Command"
-	Invoke-Command -Session $session -ScriptBlock $script -ArgumentList $folderPath, $retentionDays ,$minimumToKeep, $excludes
-	Write-Host "	- Remove-PSSession"
-	Remove-PSSession -Session $session
+	Try
+	{
+		Write-Host "Start process. Computer name : $($computer)."
+		Write-Host "	- PSCredential"
+		$credential = New-Object System.Management.Automation.PSCredential($userName, (ConvertTo-SecureString -String $password -AsPlainText -Force));
+		Write-Host "	- Initialize New-PSSession"
+		$session = New-PSSession -ComputerName $computer -Credential $credential;
+		Write-Host "	- Invoke-Command"
+		Invoke-Command -Session $session -ScriptBlock $script -ArgumentList $folderPath, $retentionDays ,$minimumToKeep, $excludes
+		Write-Host "	- Remove-PSSession"
+		Remove-PSSession -Session $session
+	}
+	Catch
+	{			
+		$errors += @($computer + " " + $_.Exception.Message)
+	}		
+}	
+
+if($errors.Count -ne 0)
+{
+	foreach( $er in $errors)
+	{
+		Write-Warning $er
+	}
+	
+	throw "$($errors.Count) errors in process. See logs"
 }
 
 
