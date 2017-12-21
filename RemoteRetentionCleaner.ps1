@@ -11,6 +11,7 @@ Trace-VstsEnteringInvocation $MyInvocation
 [string]$userName = Get-VstsInput -Name "userName" -Require
 [string]$password = Get-VstsInput -Name "password" -Require
 [string]$excludes = (Get-VstsInput -Name "excludes").Trim().Replace("`n",",")
+[string]$winRMProtocol = Get-VstsInput -Name "winRMProtocol"
 
 Write-Host "Version 1.0.8"
 Write-Host "remoteComputer = $remoteComputer"
@@ -20,6 +21,10 @@ Write-Host "minimumToKeep = $minimumToKeep"
 Write-Host "userName = $userName"
 Write-Host "password = $password"
 Write-Host "excludes = $excludes"
+Write-Host "winRMProtocol = $winRMProtocol"
+
+$portNumber = 5985;
+$sslArg = $false;
 
 if([string]::IsNullOrWhiteSpace($folderPath) ) 
 {  
@@ -56,6 +61,15 @@ if([string]::IsNullOrWhiteSpace($password) )
 {
   throw [System.ArgumentException] "Password is required"
   exit
+}
+
+if(-not [string]::IsNullOrWhiteSpace($winRMProtocol) ) 
+{  
+	if ($winRMProtocol -eq "Https") 
+	{ 
+		$portNumber = 5986;
+		$sslArg = $true;
+	}
 }
 
 $script = { 
@@ -105,7 +119,8 @@ foreach($computer in $computers)
 		Write-Host "	- PSCredential"
 		$credential = New-Object System.Management.Automation.PSCredential($userName, (ConvertTo-SecureString -String $password -AsPlainText -Force));
 		Write-Host "	- Initialize New-PSSession"
-		$session = New-PSSession -ComputerName $computer -Credential $credential;
+		$session = New-PSSession -ComputerName $computer -Credential $credential -Port $portNumber -UseSSL:$sslArg;
+
 		Write-Host "	- Invoke-Command"
 		Invoke-Command -Session $session -ScriptBlock $script -ArgumentList $folderPath, $retentionDays ,$minimumToKeep, $excludes
 		Write-Host "	- Remove-PSSession"

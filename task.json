@@ -12,7 +12,7 @@
     "version":  {
                     "Major":  1,
                     "Minor":  0,
-                    "Patch":  8
+                    "Patch":  9
                 },
     "minimumAgentVersion":  "1.83.0",
     "inputs":  [
@@ -65,7 +65,18 @@
                        "defaultValue":  "2",
                        "required":  true,
                        "helpMarkDown":  "Minimum to keep."
-                   }				   
+                   },{
+                        "name": "winRMProtocol",
+                        "type": "radio",
+                        "label": "Protocol",
+                        "required": false,
+                        "defaultValue": "Http",
+                        "options": {
+                        "Http": "HTTP",
+                        "Https": "HTTPS"
+                    },
+                    "helpMarkDown": "Select the network protocol to use for the WinRM connection with the machine(s). The default is HTTP."
+                }				   
                ],
     "instanceNameFormat":  "Remote cleaner $(remoteComputer) $(folderPath).",
     "execution":  {

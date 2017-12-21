@@ -6,3 +6,4 @@
 * Enter omits items ( like : file*,\*directory, \*otherItem*)
 * Enter retention days. 
 * Enter minimum to keep.
+* Choose the network protocol (HTTP or HTTPS) used by WinRM
